@@ -1,0 +1,42 @@
+{
+	"schemaVersion": 1,
+	"id": "customstars",
+	"version": "1.0",
+	"name": "Custom stars",
+	"description": "",
+	"authors": [
+		"ScalpelRed"
+	],
+	"contact": {
+		"YouTube": "youtube.com/@scalpelred_en",
+		"YouTube (ru)": "youtube.com/@scalpelred_ru"
+	},
+	"license": "MIT",
+	"icon": "assets/customstars/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.scalpelred.customstars.CustomStars"
+		],
+		"client": [
+          "com.scalpelred.customstars.CustomStarsClient"
+		]
+	},
+	"mixins": [
+		"customstars.mixins.json",
+		{
+			"config": "customstars.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	},
+	"accessWidener": "customstars.accesswidener"
+}

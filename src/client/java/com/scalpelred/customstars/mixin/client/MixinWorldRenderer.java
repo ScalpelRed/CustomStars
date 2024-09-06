@@ -21,10 +21,16 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.zip.DataFormatException;
 
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
+
+	@Unique
+	private final Random rand = new Random(
+			//1414213562
+	);
 
 	@Shadow protected abstract void renderStars();
 
@@ -67,10 +73,10 @@ public abstract class MixinWorldRenderer {
 			= new Float[] { 1f, -1f, 0f,  1f, 1f, 0f,  -1f, 1f, 0f,  1f, -1f, 0f,  -1f, 1f, 0f,  -1f, -1f, 0f };
 	@Unique
 	private static final Float[] MODEL_CUBE;
-    static {
-        Float[] modelCube1;
-        try {
-            modelCube1 = parseObj("""
+	static {
+		Float[] modelCube1;
+		try {
+			modelCube1 = parseObj("""
                     v 1 1 -1
                     v 1 -1 -1
                     v 1 1 1
@@ -91,14 +97,14 @@ public abstract class MixinWorldRenderer {
                     f 2 4 8
                     f 1 3 4
                     f 5 1 2""");
-        }
+		}
 		catch (DataFormatException e) {
 			modelCube1 = new Float[0];
 		}
-        MODEL_CUBE = modelCube1;
-    }
+		MODEL_CUBE = modelCube1;
+	}
 
-    @Unique
+	@Unique
 	private static Float[] parseObj(String src) throws DataFormatException {
 
 		List<Float> coords = new ArrayList<>();
@@ -165,7 +171,7 @@ public abstract class MixinWorldRenderer {
 				content = Files.readString(file.toPath());
 			}
 			catch (IOException e) {
-                CustomStars.LOGGER.error("Error reading file {}, {}", file.getName(), e.getMessage());
+				CustomStars.LOGGER.error("Error reading file {}, {}", file.getName(), e.getMessage());
 				continue;
 			}
 			Float[] mdl;

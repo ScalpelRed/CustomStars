@@ -21,10 +21,16 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.zip.DataFormatException;
 
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
+
+	@Unique
+	private final Random rand = new Random(
+			//1414213562
+	);
 
 	@Shadow protected abstract void renderStars();
 
@@ -66,19 +72,19 @@ public abstract class MixinWorldRenderer {
 
 		float globalScale; {
 			float globalScaleMin = config.GeneralScaleMin.getValue();
-			globalScale = globalScaleMin + (config.GeneralScaleMax.getValue() - globalScaleMin) * (float) Math.random();
+			globalScale = globalScaleMin + (config.GeneralScaleMax.getValue() - globalScaleMin) * rand.nextFloat();
 		}
 		float globalRotationX; {
 			float globalRotationXMin = config.GeneralRotationXMin.getValue();
-			globalRotationX = globalRotationXMin + (config.GeneralRotationXMax.getValue() - globalRotationXMin) * (float) Math.random();
+			globalRotationX = globalRotationXMin + (config.GeneralRotationXMax.getValue() - globalRotationXMin) * rand.nextFloat();
 		}
 		float globalRotationY; {
 			float globalRotationYMin = config.GeneralRotationYMin.getValue();
-			globalRotationY = globalRotationYMin + (config.GeneralRotationYMax.getValue() - globalRotationYMin) * (float) Math.random();
+			globalRotationY = globalRotationYMin + (config.GeneralRotationYMax.getValue() - globalRotationYMin) * rand.nextFloat();
 		}
 		float globalRotationZ; {
 			float globalRotationZMin = config.GeneralRotationZMin.getValue();
-			globalRotationZ = globalRotationZMin + (config.GeneralRotationZMax.getValue() - globalRotationZMin) * (float) Math.random();
+			globalRotationZ = globalRotationZMin + (config.GeneralRotationZMax.getValue() - globalRotationZMin) * rand.nextFloat();
 		}
 
 		float localScaleMin = config.IndividualScaleMin.getValue();
@@ -91,22 +97,22 @@ public abstract class MixinWorldRenderer {
 		float localRotationZDelta = config.IndividualRotationZMax.getValue() - localRotationZMin;
 
 		for (int i = 0; i < starCount; i++) {
-			float x = (float)(Math.random() * 2f - 1f);
-			float y = (float)(Math.random() * 2f - 1f);
-			float z = (float)(Math.random() * 2f - 1f);
+			float x = rand.nextFloat() * 2f - 1f;
+			float y = rand.nextFloat() * 2f - 1f;
+			float z = rand.nextFloat() * 2f - 1f;
 
 			float r = MathHelper.magnitude(x, y, z);
 			if (!radiusBasedRandomization || ((r > 0.010000001f) && (r < 1.0f))) {
 
 				Vector3f pos = new Vector3f(x, y, z).mul(skySphereRadius / r);
-				float scale = localScaleMin + localScaleDelta * (float)Math.random();
-				float rotX = localRotationXMin + localRotationXDelta * (float)Math.random();
-				float rotY = localRotationYMin + localRotationYDelta * (float)Math.random();
-				float rotZ = localRotationZMin + localRotationZDelta * (float)Math.random();
+				float scale = localScaleMin + localScaleDelta * rand.nextFloat();
+				float rotX = localRotationXMin + localRotationXDelta * rand.nextFloat();
+				float rotY = localRotationYMin + localRotationYDelta * rand.nextFloat();
+				float rotZ = localRotationZMin + localRotationZDelta * rand.nextFloat();
 				Quaternionf q = new Quaternionf().rotateTo(new Vector3f(0f, 0f, -1f), pos).rotateXYZ(
 						globalRotationX + rotX, globalRotationY + rotY, globalRotationZ + rotZ);
 
-				Float[] mdl = starModels[(int)(Math.random() * starModels.length)]; // it's kinda unnecessary when there's only one model
+				Float[] mdl = starModels[(int)(rand.nextFloat() * starModels.length)]; // it's kinda unnecessary when there's only one model
 				for (int fi = 0; fi < mdl.length; fi += 9) {
 					for (int vi = 0; vi < 9; vi += 3) {
 						int index = fi + vi;
@@ -130,10 +136,10 @@ public abstract class MixinWorldRenderer {
 			= new Float[] { 1f, -1f, 0f,  1f, 1f, 0f,  -1f, 1f, 0f,  1f, -1f, 0f,  -1f, 1f, 0f,  -1f, -1f, 0f };
 	@Unique
 	private static final Float[] MODEL_CUBE;
-    static {
-        Float[] modelCube1;
-        try {
-            modelCube1 = parseObj("""
+	static {
+		Float[] modelCube1;
+		try {
+			modelCube1 = parseObj("""
                     v 1 1 -1
                     v 1 -1 -1
                     v 1 1 1
@@ -154,14 +160,14 @@ public abstract class MixinWorldRenderer {
                     f 2 4 8
                     f 1 3 4
                     f 5 1 2""");
-        }
+		}
 		catch (DataFormatException e) {
 			modelCube1 = new Float[0];
 		}
-        MODEL_CUBE = modelCube1;
-    }
+		MODEL_CUBE = modelCube1;
+	}
 
-    @Unique
+	@Unique
 	private static Float[] parseObj(String src) throws DataFormatException {
 
 		List<Float> coords = new ArrayList<>();
@@ -228,7 +234,7 @@ public abstract class MixinWorldRenderer {
 				content = Files.readString(file.toPath());
 			}
 			catch (IOException e) {
-                CustomStars.LOGGER.error("Error reading file {}, {}", file.getName(), e.getMessage());
+				CustomStars.LOGGER.error("Error reading file {}, {}", file.getName(), e.getMessage());
 				continue;
 			}
 			Float[] mdl;
